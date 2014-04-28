@@ -1,0 +1,3 @@
+<TextureAtlas imagePath="sprites.png">
+	<SubTexture name="env_tiles_front.png" x="0" y="0" width="81" height="401"/>
+</TextureAtlas>

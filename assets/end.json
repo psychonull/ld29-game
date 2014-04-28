@@ -1,0 +1,12 @@
+{
+  "frames": [{
+    "filename": "floor_right",
+    "frame": {"x":0,"y":0,"w":700,"h":200}
+  },{
+    "filename": "floor_left",
+    "frame": {"x":600,"y":0,"w":424,"h":200}
+  }, {
+    "filename": "gold_pile",
+    "frame": {"x":80,"y":240,"w":355,"h":160}
+  }]
+}

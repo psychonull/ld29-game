@@ -1,0 +1,21 @@
+{
+  "frames": [{
+    "filename": "stair",
+    "frame": {"x":0,"y":0,"w":80,"h":80}
+  },{
+    "filename": "hole",
+    "frame": {"x":0,"y":80,"w":80,"h":80}
+  },{
+    "filename": "light",
+    "frame": {"x":220,"y":0,"w":120,"h":180}
+  },{
+    "filename": "company_assets",
+    "frame": {"x":0,"y":160,"w":220,"h":190}
+  },{
+    "filename": "savings_sight",
+    "frame": {"x":0,"y":350,"w":140,"h":130}
+  },{
+    "filename": "freedom_sight",
+    "frame": {"x":140,"y":350,"w":190,"h":115}
+  }]
+}
