@@ -150,7 +150,14 @@ var Cart = function(game, x, y, frame) {
 
   this.animations.add('empty', [0,1,2,3,4], true);
   this.animations.add('filled', [5,6,7,8,9]);
-  this.animations.play('empty'); 
+  this.animations.play('empty');
+
+  this.collideSound = this.game.add.audio('collide');
+  this.collideSound.volume = 0.3;
+  this.collideShortSound = this.game.add.audio('collide_short');
+  this.collideShortSound.volume = 0.3;
+  this.collideStartingSound = this.game.add.audio('collide_starting');
+  this.collideStartingSound.volume = 0.3;
 
   this.emitter = this.game.add.emitter(50, 50, 10);
 };
@@ -256,11 +263,11 @@ Cart.prototype.shootParticles = function(type){
 };
 
 Cart.prototype.animateText = function(text){
-  
+
   var x = this.x;
   var y = this.y;
   
-  var txt = this.game.add.bitmapText(x + (100*this.facing), y, 'minecraftia_white', text , 30);
+  var txt = this.game.add.bitmapText(x + (100*this.facing), y, 'minecraftia_white', text.toString() , 30);
   txt.tint = 0xFF0000;
   this.game.add.tween(txt).to({alpha: 0, y: y-100, x: x + (this.facing*this.currentVelocity) }, 750, Phaser.Easing.Quadratic.InOut, true, 0, false);
 };
@@ -270,7 +277,7 @@ Cart.prototype.animateTextGold = function(text){
   var x = this.x;
   var y = this.y-50;
   
-  var txt = this.game.add.bitmapText(x, y, 'minecraftia_white', text , 30);
+  var txt = this.game.add.bitmapText(x, y, 'minecraftia_white', text.toString() , 30);
   txt.tint = 0xf3c907;
   this.game.add.tween(txt).to({alpha: 0, y: y-200 }, 1500, Phaser.Easing.Quadratic.InOut, true, 0, false);
   //this.game.add.tween(txt).to(properties, duration, ease, autoStart, delay, repeat, yoyo);
@@ -291,15 +298,20 @@ Cart.prototype.checkCollisions = function(railsGroup){
       this.collectedStuff.dispatch(this.game.rnd.integerInRange(10,1000));
     }
     else if(obstacle.data.type === 'start'){
+      this.collideStartingSound.play();
       this.facing = 1;
       this.collidedStartingPoint.dispatch();
     }
     else {
+      if(this.game.rnd.integerInRange(1,2) === 1){
+        this.collideSound.play();
+      }
+      else {
+        this.collideShortSound.play();
+      }
       this.shootParticles('chips');
-
       this.collidedObstacle.dispatch(obstacle.data.loseFactor, obstacle);
       this.x += this.jumpOnCollide * this.facing;
-      this.animateText("-" + obstacle.data.loseFactor.toString());
     }
     
     this.collided = true;
@@ -336,6 +348,8 @@ var Ending = function(game) {
   this.collectText.y = 20;
   this.add(this.collectText);
   this.collectText.start();
+  this.coinPickupSound = this.game.add.audio('coinPickup');
+  this.coinPickupSound.volume = 0.3;
 };
 
 Ending.prototype = Object.create(Phaser.Group.prototype);
@@ -345,6 +359,9 @@ Ending.prototype.clickGold = function() {
   if(!this._running){
     return;
   }
+  
+  this.coinPickupSound.play();  
+
   this.goldClick.dispatch();
 
   this.goldEmitter.x = this.game.rnd.integerInRange(120,280);
@@ -1125,8 +1142,10 @@ Play.prototype = {
     }, this);
 
     this.cart.collidedObstacle.add(function(amt){
-      this.hud.score(amt * this.game.rnd.integerInRange(-50, -5));
+      var lostGold = amt * this.game.rnd.integerInRange(-50, -5);
+      this.hud.score(lostGold);
       this.cart.gold = this.hud.score();
+      this.cart.animateText(lostGold);
     }, this);
 
     this.cart.init(this.game.playerState);
@@ -1259,6 +1278,10 @@ Preload.prototype = {
 
     this.game.load.audio('playSfx', 'assets/sounds/mainMenuPlay.wav');
     this.game.load.audio('bgm', 'assets/sounds/ld29bgm.mp3');
+    this.game.load.audio('coinPickup', 'assets/sounds/coinPickup.wav');
+    this.game.load.audio('collide', 'assets/sounds/Collide.wav');
+    this.game.load.audio('collide_short', 'assets/sounds/Collide short.wav');
+    this.game.load.audio('collide_starting', 'assets/sounds/Starting.wav');
 
     window.formatNumber = function(nbo, zeros){
       function pad (str, max) {
