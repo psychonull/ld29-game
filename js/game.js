@@ -44,8 +44,8 @@ var Beginning = function(game, state) {
   sales.scale.y = 0.9;
   this.add(sales);
   
-  this.add(this.game.add.bitmapText(saleX + 62, saleY + 22, 'minecraftia', 'HAPPINESS', 14));
-  this.add(this.game.add.bitmapText(saleX + 82, saleY + 42, 'minecraftia', 'ON SALE', 14));
+  this.add(this.game.add.bitmapText(saleX + 62, saleY + 22, 'minecraftia', 'SALE!!', 14));
+  this.add(this.game.add.bitmapText(saleX + 62, saleY + 42, 'minecraftia', 'freedom tickets', 10));
   this.add(this.game.add.bitmapText(saleX + 62, saleY + 65, 'minecraftia', 
     window.formatNumber(PlayerStateManager.GOLD_REQUIRED_FOR_FREEDOM, 6), 20));
 
@@ -1128,7 +1128,7 @@ Play.prototype = {
       this.rails.setFacing(-1);
       
       this.cart.currentVelocity = 0;
-      this.hud.startCowntdown(1*1000);
+      this.hud.startCowntdown(this.game.playerState.getCollectTime());
       this.hud.timer.visible = true;
       this.ending.start();
       
@@ -1137,12 +1137,13 @@ Play.prototype = {
         this.game.add.tween(this.game.camera.deadzone).to({x: 750}, 1000, Phaser.Easing.Linear.NONE, true, 0, 0, false);
         this.cart.currentVelocity = this.game.playerState.getCartSpeed();
         this.ending.end();
+        this.hud.timer.visible = false;
       }, this);
 
     }, this);
 
     this.cart.collidedObstacle.add(function(amt){
-      var lostGold = amt * this.game.rnd.integerInRange(-50, -5);
+      var lostGold = amt * this.game.playerState.getRandomBaseGoldAMountToDrop();
       this.hud.score(lostGold);
       this.cart.gold = this.hud.score();
       this.cart.animateText(lostGold);
@@ -1321,7 +1322,7 @@ ObstacleTypes = {
 	"1" : {
 		res: "cart",
 		type: "lose",
-		loseFactor: 3
+		loseFactor: 2
 	},
 	"2" : {
 		res: "env",
@@ -1372,6 +1373,7 @@ var game = Phaser.GAMES[0];
 
 var PlayerStateManager = function(){
   this.gamesPlayed = 0;
+  this.gamesLost = 0;
 
   this.freedomGold = 0;
   this.surplusGold = 0;
@@ -1397,7 +1399,12 @@ PlayerStateManager.prototype = {
     }
   },
   getRandomGoldAmountToPick: function(){
+    //if()
     return this.gamesPlayed * game.rnd.integerInRange(100, 500);
+  },
+  getRandomBaseGoldAMountToDrop: function(){
+    // THIS WILL BE MULTIPLIED BY THE OBSTACLE RATE
+    return game.rnd.integerInRange(-1000, -10);
   },
   getCartSpeed: function(){
     var speed = 750;
@@ -1405,20 +1412,42 @@ PlayerStateManager.prototype = {
       speed = 400;
     }
     else if(this.gamesPlayed > 1 && this.gamesPlayed < 5){
+      speed = 500;
+    }
+    else if(this.gamesPlayed >= 5 && this.gamesPlayed < 10){
+      speed = 600;
+    }
+    else if(this.gamesPlayed >= 10 && this.gamesPlayed < 15){
       speed = 700;
     }
-    else if(this.gamesPlayed >= 5 && this.gamesPlayed < 7){
-      speed = 900;
+    else if(this.gamesPlayed >= 15 && this.gamesPlayed < 20){
+      speed = 800;
     }
     else {
       speed = 900 * (this.gamesPlayed / 6);
     }
+    if(speed > PlayerStateManager.MAX_SPEED){
+      return PlayerStateManager.MAX_SPEED;
+    }
     return speed;
+  },
+  getCollectTime: function(){
+    if(this.gamesPlayed == 1){
+      return 3000
+    }
+    else{
+      return 1000;
+    }
+  },
+  getMapLength: function(){
+    return Math.min(25 * (this.gamesPlayed), PlayerStateManager.MAX_MAP_LENGTH);
   }
 };
 
-PlayerStateManager.LOSE_THRESHOLD = -10000;
+PlayerStateManager.LOSE_THRESHOLD = -6666;
 PlayerStateManager.GOLD_REQUIRED_FOR_FREEDOM = 100000;
+PlayerStateManager.MAX_SPEED = 1000;
+PlayerStateManager.MAX_MAP_LENGTH = 800;
 
 module.exports = PlayerStateManager;
 },{}],22:[function(require,module,exports){
@@ -1455,12 +1484,26 @@ var RailsMapGenerator = {
 	},
 
 	getDifficulty: function(state){
+		var dif = 1;
 		var BASE_DIFICULTY = 3;
-		return BASE_DIFICULTY + Math.round(state.gamesPlayed / 3)
+		if (state.gamesPlayed < 5){
+			dif = BASE_DIFICULTY + Math.round(state.gamesPlayed) + 2;
+		}
+		else if(state.gamesPlayed >= 5 && state.gamesPlayed < 10){
+	      	dif = BASE_DIFICULTY + Math.round(state.gamesPlayed) - 1;
+	    }
+	    else if(state.gamesPlayed >= 10 && state.gamesPlayed < 15){
+	      dif =  7
+	    }
+	    else {
+	    	dif = 10;
+	    }
+	    return Math.min(dif, 15);
+		//return BASE_DIFICULTY + Math.round(state.gamesPlayed / 3)
 	},
 
 	getLength: function(state){
-		return 25 * (state.gamesPlayed);
+		return state.getMapLength();
 	}
 
 };
