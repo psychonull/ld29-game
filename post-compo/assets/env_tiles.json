@@ -1,0 +1,33 @@
+{
+  "frames": [{
+  	"filename": "rail_0",
+  	"frame": {"x":0,"y":0,"w":80,"h":80}
+  },{
+    "filename": "rail_1",
+    "frame": {"x":80,"y":0,"w":80,"h":80}
+  },{
+    "filename": "rail_2",
+    "frame": {"x":160,"y":0,"w":80,"h":80}
+  },{
+    "filename": "rail_3",
+    "frame": {"x":240,"y":0,"w":80,"h":80}
+  },{
+  	"filename": "floor",
+  	"frame": {"x":0,"y":80,"w":80,"h":80}
+  },{
+    "filename": "rock",
+    "frame": {"x":80,"y":80,"w":80,"h":80}
+  },{
+    "filename": "plant",
+    "frame": {"x":160,"y":80,"w":80,"h":80}
+  },{
+    "filename": "stop_right",
+    "frame": {"x":0,"y":160,"w":80,"h":80}
+  },{
+    "filename": "stop_left",
+    "frame": {"x":80,"y":160,"w":80,"h":80}
+  },{
+    "filename": "ground",
+    "frame": {"x":160,"y":160,"w":80,"h":80}
+  }]
+}

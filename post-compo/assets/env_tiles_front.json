@@ -1,0 +1,15 @@
+{
+  "frames": [{
+    "filename": "sky",
+    "frame": {"x":0,"y":0,"w":80,"h":80}
+  },{
+    "filename": "surfaceTop",
+    "frame": {"x":0,"y":80,"w":80,"h":80}
+  },{
+    "filename": "surfaceBot",
+    "frame": {"x":0,"y":160,"w":80,"h":80}
+  },{
+    "filename": "bg",
+    "frame": {"x":0,"y":320,"w":80,"h":80}
+  }]
+}
